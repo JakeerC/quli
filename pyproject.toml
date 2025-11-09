@@ -1,0 +1,46 @@
+[project]
+name = "quli"
+version = "0.1.0"
+description = "CLI quiz app powered by Gemini Flash 2.5"
+readme = "README.md"
+requires-python = ">=3.10"
+dependencies = [
+    "pydantic>=2.0.0",
+    "google-genai==1.49.0",
+    "rich>=13.0.0",
+    "click>=8.0.0",
+    "python-dotenv>=1.0.0",
+    "prompt-toolkit>=3.0.0",
+]
+
+[project.optional-dependencies]
+dev = ["pytest>=7.0.0"]
+
+[project.scripts]
+quli = "quli.cli:main"
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[tool.ruff]
+line-length = 100
+target-version = "py310"
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "N", "W", "UP", "B", "SIM"]
+ignore = ["E501"]
+# Exclude some directories
+exclude = [".venv", "__pycache__", "migrations"]
+
+# Format imports automatically
+[tool.ruff.isort]
+known-first-party = ["src"]
+combine-as-imports = true
+
+[tool.ruff.format]
+quote-style = "double"
+indent-style = "space"
+line-ending = "auto"
+skip-magic-trailing-comma = false
+docstring-code-format = true
