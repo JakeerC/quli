@@ -1,5 +1,7 @@
 """Interactive quiz mode implementation."""
 
+import sys
+
 from rich.console import Console
 from rich.prompt import Prompt
 
@@ -15,37 +17,48 @@ def run_interactive_mode(engine: QuizEngine) -> None:
     console.print("\n[bold green]Starting Interactive Quiz Mode[/bold green]\n")
     engine.start()
 
-    while not engine.is_complete():
-        question = engine.get_current_question()
-        if question is None:
-            break
+    try:
+        while not engine.is_complete():
+            question = engine.get_current_question()
+            if question is None:
+                break
 
-        question_num = engine.current_question_index + 1
-        total = len(engine.quiz.questions)
+            question_num = engine.current_question_index + 1
+            total = len(engine.quiz.questions)
 
-        display_question(question, question_num, total)
+            display_question(question, question_num, total)
 
-        try:
-            answer = get_answer_interactive(question)
-        except (OSError, ImportError):
-            # Fallback if arrow keys don't work
-            answer = get_answer_simple(question)
+            try:
+                answer = get_answer_interactive(question)
+            except (OSError, ImportError):
+                # Fallback if arrow keys don't work
+                answer = get_answer_simple(question)
+            except KeyboardInterrupt:
+                console.print("\n[yellow]Quiz cancelled[/yellow]")
+                sys.exit(0)
 
-        user_answer = engine.submit_answer(answer)
+            user_answer = engine.submit_answer(answer)
 
-        # Show immediate feedback
-        if user_answer.is_correct:
-            console.print("\n[bold green]✓ Correct![/bold green]")
-        else:
-            console.print("\n[bold red]✗ Incorrect[/bold red]")
-            console.print(f"[yellow]Correct answer: {question.correct_answer}[/yellow]")
+            # Show immediate feedback
+            if user_answer.is_correct:
+                console.print("\n[bold green]✓ Correct![/bold green]")
+            else:
+                console.print("\n[bold red]✗ Incorrect[/bold red]")
+                console.print(f"[yellow]Correct answer: {question.correct_answer}[/yellow]")
 
-        if question.explanation:
-            console.print(f"[dim]{question.explanation}[/dim]")
+            if question.explanation:
+                console.print(f"[dim]{question.explanation}[/dim]")
 
-        if question_num < total:
-            Prompt.ask("\nPress Enter to continue", default="")
+            if question_num < total:
+                try:
+                    Prompt.ask("\nPress Enter to continue", default="")
+                except KeyboardInterrupt:
+                    console.print("\n[yellow]Quiz cancelled[/yellow]")
+                    sys.exit(0)
 
-    # Show results
-    result = engine.get_result()
-    display_results(result)
+        # Show results
+        result = engine.get_result()
+        display_results(result)
+    except KeyboardInterrupt:
+        console.print("\n[yellow]Quiz cancelled[/yellow]")
+        sys.exit(0)

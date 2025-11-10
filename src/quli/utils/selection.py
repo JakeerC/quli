@@ -49,14 +49,38 @@ def select_with_arrows(options: list[str], prompt_text: str = "Select an option"
         # Create radio list for selection
         radio_list = RadioList(values=[(i, opt) for i, opt in enumerate(options)])
 
+        # Create key bindings
+        kb = KeyBindings()
+
+        # Enter key submits the selection
+        # Use eager=True to ensure this binding takes precedence over default RadioList behavior
+        @kb.add("enter", eager=True)
+        def submit(event):
+            # Get the currently selected value from the radio list
+            selected_index = radio_list.current_value
+            event.app.exit(result=selected_index)
+
+        # Control+C quits the quiz
+        @kb.add("c-c")
+        def quit_app(event):
+            console.print("\n[yellow]Quiz cancelled[/yellow]")
+            sys.exit(0)
+
         app = Application(
             layout=Layout(HSplit([radio_list])),
-            key_bindings=KeyBindings(),
+            key_bindings=kb,
             full_screen=False,
         )
 
         result = app.run()
-        return options[result]
+        if result is not None:
+            return options[result]
+        else:
+            # If no result, return the first option as fallback
+            return options[0]
+    except KeyboardInterrupt:
+        console.print("\n[yellow]Quiz cancelled[/yellow]")
+        sys.exit(0)
     except (ImportError, Exception):
         # Fallback to simple selection
         return select_option(options, prompt_text)
