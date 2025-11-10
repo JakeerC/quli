@@ -12,6 +12,15 @@ A command-line quiz application powered by Gemini Flash 2.5 for generating quiz 
 - Built with Pydantic for data validation
 - Designed for easy scaling to Streamlit
 
+## File responsibilities
+- `cli.py`: Main entry point, configuration gathering, orchestration
+- `ui/display.py`: Question and results display formatting
+- `ui/input.py`: Answer input handling (interactive and simple fallback)
+- `utils/selection.py`: Selection utilities (arrow keys, numbered options)
+- `modes/interactive.py`: Interactive quiz mode (question-by-question with feedback)
+- `modes/batch.py`: Batch quiz mode (all questions, then score)
+
+
 ## Installation
 
 1. Install uv (if not already installed):

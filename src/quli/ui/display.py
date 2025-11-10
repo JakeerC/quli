@@ -52,4 +52,3 @@ def display_results(result: QuizResult, show_answers: bool = False) -> None:
             )
 
         console.print(table)
-

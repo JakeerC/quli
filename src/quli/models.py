@@ -95,4 +95,3 @@ class QuizResult(BaseModel):
     def percentage(self) -> float:
         """Return score as percentage."""
         return self.score
-

@@ -1,8 +1,7 @@
 """Interactive quiz mode implementation."""
 
-from rich.prompt import Prompt
-
 from rich.console import Console
+from rich.prompt import Prompt
 
 from quli.engine import QuizEngine
 from quli.ui.display import display_question, display_results
@@ -50,4 +49,3 @@ def run_interactive_mode(engine: QuizEngine) -> None:
     # Show results
     result = engine.get_result()
     display_results(result)
-

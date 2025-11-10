@@ -38,4 +38,3 @@ def run_batch_mode(engine: QuizEngine) -> None:
     # Show results
     result = engine.get_result()
     display_results(result, show_answers=True)
-

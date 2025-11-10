@@ -8,8 +8,8 @@ from rich.prompt import Prompt
 
 from quli.engine import QuizEngine
 from quli.generator import QuizGenerator
-from quli.modes import run_batch_mode, run_interactive_mode
 from quli.models import Difficulty, QuestionType, QuizConfig
+from quli.modes import run_batch_mode, run_interactive_mode
 from quli.utils.selection import select_option
 
 console = Console()

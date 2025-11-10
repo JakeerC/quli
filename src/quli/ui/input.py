@@ -47,4 +47,3 @@ def get_answer_simple(question: Question) -> str:
         options = ["True", "False"]
         selected = select_option(options, "Select True or False")
         return selected
-
