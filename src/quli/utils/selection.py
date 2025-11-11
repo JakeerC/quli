@@ -9,6 +9,8 @@ from prompt_toolkit.widgets import RadioList
 from rich.console import Console
 from rich.prompt import Prompt
 
+from quli.ui.styles import get_console, get_symbols
+
 console = Console()
 
 
@@ -19,9 +21,11 @@ def select_option(
 
     # Use rich's Confirm for simple yes/no, but for multiple options we'll use a custom approach
     # For now, we'll use a numbered list with input
+    console = get_console()
+    symbols = get_symbols()
     console.print(f"\n[bold]{prompt_text}[/bold]")
     for i, option in enumerate(options, 1):
-        marker = "→" if i == default + 1 else " "
+        marker = symbols.arrow if i == default + 1 else " "
         console.print(f"  {marker} {i}. {option}")
 
     while True:
@@ -63,7 +67,7 @@ def select_with_arrows(options: list[str], prompt_text: str = "Select an option"
         # Control+C quits the quiz
         @kb.add("c-c")
         def quit_app(event):
-            console.print("\n[yellow]Quiz cancelled[/yellow]")
+            get_console().print("\n[yellow]Quiz cancelled[/yellow]")
             sys.exit(0)
 
         app = Application(
@@ -79,7 +83,7 @@ def select_with_arrows(options: list[str], prompt_text: str = "Select an option"
             # If no result, return the first option as fallback
             return options[0]
     except KeyboardInterrupt:
-        console.print("\n[yellow]Quiz cancelled[/yellow]")
+        get_console().print("\n[yellow]Quiz cancelled[/yellow]")
         sys.exit(0)
     except (ImportError, Exception):
         # Fallback to simple selection
