@@ -1,31 +1,32 @@
 """Display functions for quiz questions and results."""
 
-from rich.console import Console
+from rich.rule import Rule
 from rich.table import Table
 
 from quli.models import Question, QuestionType, QuizResult
-
-console = Console()
+from quli.ui.styles import get_console, get_symbols
 
 
 def display_question(question: Question, question_num: int, total: int) -> None:
     """Display a question with formatting."""
-    console.print(f"\n[bold cyan]Question {question_num}/{total}[/bold cyan]")
+    console = get_console()
+    symbols = get_symbols()
+    console.print(Rule(title=f"[section.title]Question {question_num}/{total}[/section.title]"))
     console.print(f"[bold]{question.question_text}[/bold]\n")
 
     if question.question_type == QuestionType.MULTIPLE_CHOICE:
         for i, option in enumerate(question.options, 1):
-            console.print(f"  {i}. {option}")
+            console.print(f"  {symbols.arrow} {i}. {option}")
     elif question.question_type == QuestionType.TRUE_FALSE:
-        console.print("  1. True")
-        console.print("  2. False")
+        console.print(f"  {symbols.arrow} 1. True")
+        console.print(f"  {symbols.arrow} 2. False")
 
 
 def display_results(result: QuizResult, show_answers: bool = False) -> None:
     """Display quiz results."""
-    console.print("\n" + "=" * 50)
-    console.print("[bold cyan]Quiz Results[/bold cyan]")
-    console.print("=" * 50 + "\n")
+    console = get_console()
+    symbols = get_symbols()
+    console.print(Rule(title="[section.title]Quiz Results[/section.title]"))
 
     score_color = "green" if result.score >= 70 else "yellow" if result.score >= 50 else "red"
     console.print(f"Score: [{score_color}]{result.score:.1f}%[/{score_color}]")
@@ -35,7 +36,7 @@ def display_results(result: QuizResult, show_answers: bool = False) -> None:
         console.print(f"Time: {result.time_taken:.1f} seconds\n")
 
     if show_answers:
-        table = Table(title="Question Review")
+        table = Table(title="Question Review", show_lines=False, header_style="section.title")
         table.add_column("Question", style="cyan")
         table.add_column("Your Answer", style="yellow")
         table.add_column("Correct Answer", style="green")
@@ -43,7 +44,9 @@ def display_results(result: QuizResult, show_answers: bool = False) -> None:
 
         for answer in result.answers:
             question = result.quiz.questions[answer.question_index]
-            result_mark = "[green]✓[/green]" if answer.is_correct else "[red]✗[/red]"
+            mark = symbols.check if answer.is_correct else symbols.cross
+            mark_color = "green" if answer.is_correct else "red"
+            result_mark = f"[{mark_color}]{mark}[/{mark_color}]"
             table.add_row(
                 question.question_text[:50] + "...",
                 answer.answer,

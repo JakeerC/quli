@@ -6,6 +6,7 @@ from rich.console import Console
 from rich.prompt import Prompt
 
 from quli.models import Question, QuestionType
+from quli.ui.styles import get_console
 from quli.utils.selection import select_option, select_with_arrows
 
 console = Console()
@@ -23,6 +24,7 @@ def get_answer_interactive(question: Question) -> str:
 
 def get_answer_simple(question: Question) -> str:
     """Get answer using simple input (fallback)."""
+    console = get_console()
     if question.question_type == QuestionType.MULTIPLE_CHOICE:
         options_text = "\n".join([f"  {i + 1}. {opt}" for i, opt in enumerate(question.options)])
         console.print(options_text)

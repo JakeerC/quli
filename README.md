@@ -7,6 +7,11 @@ A command-line quiz application powered by Gemini Flash 2.5 for generating quiz 
 - [Quli - CLI Quiz App](#quli---cli-quiz-app)
   - [Table of Contents](#table-of-contents)
   - [Features](#features)
+  - [CLI Styling and Accessibility](#cli-styling-and-accessibility)
+    - [Themes](#themes)
+    - [Symbols and Fonts](#symbols-and-fonts)
+    - [Accessibility Notes](#accessibility-notes)
+    - [Example](#example)
   - [File Responsibilities](#file-responsibilities)
   - [Folder structure](#folder-structure)
   - [Installation](#installation)
@@ -27,8 +32,53 @@ A command-line quiz application powered by Gemini Flash 2.5 for generating quiz 
 - Interactive arrow key navigation
 - Two quiz modes: Interactive (question-by-question) and Batch (all at once)
 - Minimal configuration by default, advanced options available
+- Configurable CLI styling with themes, symbols, and accessibility fallbacks
 - Built with Pydantic for data validation
 - Designed for easy scaling to Streamlit
+
+## CLI Styling and Accessibility
+
+Quli ships with configurable, accessible CLI styling. It uses Rich (already a dependency) and prompt-toolkit.
+
+### Themes
+- classic (default when color is available)
+- high-contrast (better readability with strong colors)
+- auto (chooses based on terminal capabilities)
+
+Select with:
+
+```bash
+uv run quli --style auto        # or classic, high-contrast
+```
+
+### Symbols and Fonts
+- Unicode symbols are used when supported by your terminal/locale.
+- Nerd Font glyphs are used when available/preferred (e.g., JetBrains Mono Nerd Font). If unavailable, Quli falls back to Unicode or ASCII.
+
+Overrides:
+
+```bash
+uv run quli --ascii                 # force ASCII-only symbols
+uv run quli --unicode               # force Unicode symbols (if supported)
+uv run quli --nerd-font             # prefer Nerd Font glyphs
+uv run quli --no-nerd-font          # disable Nerd Font glyphs
+```
+
+Environment hints:
+- Respect `NO_COLOR` (disables colors)
+- Respect `TERM=dumb` (disables colors)
+- Optional `NERD_FONT=1` to hint Nerd Font availability
+
+### Accessibility Notes
+- High-contrast theme emphasizes readability with minimal decoration.
+- ASCII fallbacks ensure compatibility on limited environments.
+- Unicode/nerd glyphs are only used when your terminal supports them.
+
+### Example
+
+```bash
+uv run quli --style high-contrast --nerd-font
+```
 
 ## File Responsibilities
 - `cli.py`: Main entry point, configuration gathering, orchestration

@@ -4,12 +4,15 @@ import sys
 
 import click
 from rich.console import Console
+from rich.panel import Panel
 from rich.prompt import Prompt
+from rich.rule import Rule
 
 from quli.engine import QuizEngine
 from quli.generator import QuizGenerator
 from quli.models import Difficulty, QuestionType, QuizConfig
 from quli.modes import run_batch_mode, run_interactive_mode
+from quli.ui.styles import build_console, detect_style
 from quli.utils.selection import select_option
 
 console = Console()
@@ -69,9 +72,69 @@ def get_advanced_config() -> QuizConfig:
     is_flag=True,
     help="Use advanced configuration",
 )
-def main(topic: str | None, interactive: bool, batch: bool, advanced: bool) -> None:
+@click.option(
+    "--style",
+    type=click.Choice(["auto", "classic", "high-contrast"]),
+    default="auto",
+    show_default=True,
+    help="CLI color theme",
+)
+@click.option(
+    "--ascii",
+    "ascii_override",
+    flag_value=True,
+    default=None,
+    help="Force ASCII-only symbols",
+)
+@click.option(
+    "--unicode",
+    "ascii_override",
+    flag_value=False,
+    help="Force Unicode symbols (if supported)",
+)
+@click.option(
+    "--nerd-font",
+    "nerd_font",
+    flag_value=True,
+    default=None,
+    help="Prefer Nerd Font glyphs (JetBrains Mono Nerd Font recommended)",
+)
+@click.option(
+    "--no-nerd-font",
+    "nerd_font",
+    flag_value=False,
+    help="Disable Nerd Font glyphs",
+)
+def main(
+    topic: str | None,
+    interactive: bool,
+    batch: bool,
+    advanced: bool,
+    style: str,
+    ascii_override: bool | None,
+    nerd_font: bool | None,
+) -> None:
     """Quli - CLI Quiz App powered by Gemini Flash 2.5."""
-    console.print("[bold blue]Quli Quiz App[/bold blue]\n")
+    # Build console with style
+    style_config = detect_style(style)  # auto/classic/high-contrast
+    if ascii_override is True:
+        style_config.use_unicode = False
+        style_config.use_nerd_font = False
+        style_config.symbols = style_config.symbols  # will be reset below
+    if nerd_font is not None:
+        style_config.use_nerd_font = bool(nerd_font) and style_config.use_unicode
+    # Refresh symbols based on final toggles
+    # Re-import helper to avoid circular import
+    from quli.ui.styles import _select_symbols as _sym_sel  # type: ignore
+
+    style_config.symbols = _sym_sel(style_config.use_unicode, style_config.use_nerd_font)
+    global console
+    console = build_console(style_config)
+
+    title = "[app.title]Quli Quiz App[/app.title]"
+    subtitle = "[app.subtitle]Tip: use --style, --ascii/--unicode, --nerd-font/--no-nerd-font[/app.subtitle]"
+    console.print(Panel.fit(f"{title}\n{subtitle}", border_style="app.subtitle"))
+    console.print(Rule(style="dim"))
 
     # Determine mode
     mode = "interactive" if interactive else "batch" if batch else "interactive"
