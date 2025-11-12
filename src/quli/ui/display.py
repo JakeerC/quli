@@ -1,5 +1,6 @@
 """Display functions for quiz questions and results."""
 
+from rich.panel import Panel
 from rich.rule import Rule
 from rich.table import Table
 
@@ -11,15 +12,25 @@ def display_question(question: Question, question_num: int, total: int) -> None:
     """Display a question with formatting."""
     console = get_console()
     symbols = get_symbols()
-    console.print(Rule(title=f"[section.title]Question {question_num}/{total}[/section.title]"))
-    console.print(f"[bold]{question.question_text}[/bold]\n")
+
+    # Build question content with left padding
+    question_content = f"    [bold]{question.question_text}[/bold]\n"
 
     if question.question_type == QuestionType.MULTIPLE_CHOICE:
         for i, option in enumerate(question.options, 1):
-            console.print(f"  {symbols.arrow} {i}. {option}")
+            question_content += f"    {symbols.arrow} {i}. {option}\n"
     elif question.question_type == QuestionType.TRUE_FALSE:
-        console.print(f"  {symbols.arrow} 1. True")
-        console.print(f"  {symbols.arrow} 2. False")
+        question_content += f"    {symbols.arrow} 1. True\n"
+        question_content += f"    {symbols.arrow} 2. False\n"
+
+    # Display question in a bordered panel
+    console.print(
+        Panel(
+            question_content.rstrip(),
+            title=f"[section.title]Question {question_num}/{total}[/section.title]",
+            border_style="section.title",
+        )
+    )
 
 
 def display_results(result: QuizResult, show_answers: bool = False) -> None:
