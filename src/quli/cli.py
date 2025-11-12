@@ -132,7 +132,7 @@ def main(
     console = build_console(style_config)
 
     title = "[app.title]Quli Quiz App[/app.title]"
-    subtitle = "[app.subtitle]Tip: use --style, --ascii/--unicode, --nerd-font/--no-nerd-font[/app.subtitle]"
+    subtitle = "[app.subtitle]Tip: use --help for available features/commands\n\tarrow keys to change options\n\tspace to select answer\n\tenter to submit answer[/app.subtitle]"
     console.print(Panel.fit(f"{title}\n{subtitle}", border_style="app.subtitle"))
     console.print(Rule(style="dim"))
 
