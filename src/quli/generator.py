@@ -18,7 +18,13 @@ class QuizGenerator:
 
         self.api_key = api_key
         # Try model names in order of preference
-        self.model_names = ["gemini-2.5-flash"]
+        self.model_names = [
+            "gemini-2.5-flash",
+            "gemini-2.0-flash",
+            "gemini-2.0-flash-lite",
+            "gemini-2.5-pro",
+            "gemini-1.5-flash",
+        ]
         self.model_name = self.model_names[0]
 
         # Initialize the client
