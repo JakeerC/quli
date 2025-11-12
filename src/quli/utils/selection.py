@@ -50,8 +50,23 @@ def select_option(
 def select_with_arrows(options: list[str], prompt_text: str = "Select an option") -> str:
     """Select an option using arrow keys with prompt_toolkit."""
     try:
-        # Create radio list for selection
-        radio_list = RadioList(values=[(i, opt) for i, opt in enumerate(options)])
+        # Use a nerd font select character if available, otherwise fallback to default
+        try:
+            open_character: str = "["
+            select_character = ""
+            close_character: str = "]"
+        except Exception:
+            open_character: str = "("
+            select_character = "●"
+            close_character: str = ")"
+        # Create radio list for selection, customizing the marker if possible (prompt_toolkit 3.0.30+)
+        radio_list = RadioList(
+            values=[(i, opt) for i, opt in enumerate(options)],
+            open_character=open_character,
+            select_character=select_character,
+            close_character=close_character,
+            show_scrollbar=False,
+        )
 
         # Create key bindings
         kb = KeyBindings()
