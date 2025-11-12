@@ -1,10 +1,10 @@
-# Quli - CLI Quiz App
+# Quli - Quiz App
 
-A command-line quiz application powered by Gemini Flash 2.5 for generating quiz questions.
+A quiz application powered by Gemini Flash 2.5 for generating quiz questions. Available as both a CLI tool and a Streamlit web interface.
 
 ## Table of Contents
 
-- [Quli - CLI Quiz App](#quli---cli-quiz-app)
+- [Quli - Quiz App](#quli---quiz-app)
   - [Table of Contents](#table-of-contents)
   - [Features](#features)
   - [CLI Styling and Accessibility](#cli-styling-and-accessibility)
@@ -23,18 +23,22 @@ A command-line quiz application powered by Gemini Flash 2.5 for generating quiz 
     - [Advanced Configuration](#advanced-configuration)
     - [Answering Questions](#answering-questions)
     - [Examples](#examples)
+  - [Streamlit Web Interface](#streamlit-web-interface)
+    - [Launching the Streamlit App](#launching-the-streamlit-app)
+    - [Streamlit Features](#streamlit-features)
+    - [Streamlit vs CLI Comparison](#streamlit-vs-cli-comparison)
+    - [Troubleshooting Streamlit](#troubleshooting-streamlit)
   - [Development](#development)
 
 ## Features
 
 - Generate quiz questions on any topic using Gemini Flash 2.5
 - Multiple choice and True/False question types
-- Interactive arrow key navigation
 - Two quiz modes: Interactive (question-by-question) and Batch (all at once)
+- **CLI Interface**: Terminal-based with arrow key navigation and configurable styling
+- **Streamlit Web UI**: Modern web interface with visualizations and interactive charts
 - Minimal configuration by default, advanced options available
-- Configurable CLI styling with themes, symbols, and accessibility fallbacks
 - Built with Pydantic for data validation
-- Designed for easy scaling to Streamlit
 
 ## CLI Styling and Accessibility
 
@@ -81,13 +85,15 @@ uv run quli --style high-contrast --nerd-font
 ```
 
 ## File Responsibilities
-- `cli.py`: Main entry point, configuration gathering, orchestration
+- `cli.py`: CLI entry point, configuration gathering, orchestration
+- `streamlit_app.py`: Streamlit web interface entry point
 - `config.py`: Configuration management (API keys, environment variables, default settings)
 - `models.py`: Pydantic data models (Question, Quiz, QuizConfig, UserAnswer, QuizResult)
 - `generator.py`: Gemini API integration for quiz question generation
 - `engine.py`: Quiz engine managing flow, scoring, answer validation, and timing
-- `ui/display.py`: Question and results display formatting
-- `ui/input.py`: Answer input handling (interactive and simple fallback)
+- `ui/display.py`: CLI question and results display formatting
+- `ui/input.py`: CLI answer input handling (interactive and simple fallback)
+- `ui/streamlit/`: Streamlit UI components (config, question, results, utils)
 - `utils/selection.py`: Selection utilities (arrow keys, numbered options)
 - `modes/interactive.py`: Interactive quiz mode (question-by-question with feedback)
 - `modes/batch.py`: Batch quiz mode (all questions, then score)
@@ -97,6 +103,7 @@ uv run quli --style high-contrast --nerd-font
 src/quli/
 ├── __init__.py
 ├── cli.py
+├── streamlit_app.py          # Streamlit web interface
 ├── config.py
 ├── engine.py
 ├── generator.py
@@ -104,7 +111,13 @@ src/quli/
 ├── ui/
 │   ├── __init__.py
 │   ├── display.py (display_question, display_results)
-│   └── input.py (get_answer_interactive, get_answer_simple)
+│   ├── input.py (get_answer_interactive, get_answer_simple)
+│   └── streamlit/            # Streamlit UI components
+│       ├── __init__.py
+│       ├── config.py         # Configuration UI
+│       ├── question.py       # Question display components
+│       ├── results.py        # Results and visualizations
+│       └── utils.py          # Shared utilities
 ├── utils/
 │   ├── __init__.py
 │   └── selection.py (select_option, select_with_arrows)
@@ -270,6 +283,105 @@ uv run quli -t "Algorithms" -b
 uv run quli -a -t "History"
 # Then select: True/False only
 ```
+
+## Streamlit Web Interface
+
+Quli includes a modern web-based interface built with Streamlit, providing an intuitive alternative to the CLI with visual feedback and interactive charts.
+
+### Launching the Streamlit App
+
+After installing dependencies, launch the web interface:
+
+```bash
+streamlit run src/quli/streamlit_app.py
+```
+
+Or use the convenience script (if configured):
+
+```bash
+uv run quli-streamlit
+```
+
+The app will open in your default web browser, typically at `http://localhost:8501`.
+
+### Streamlit Features
+
+**Configuration Sidebar:**
+- Enter quiz topic
+- Select number of questions (1-50)
+- Choose difficulty level (Mixed, Easy, Medium, Hard)
+- Select question types (Both, Multiple Choice only, True/False only)
+- Choose quiz mode (Interactive or Batch)
+
+**Interactive Quiz Taking:**
+- Progress bar showing completion status
+- Visual question display with difficulty indicators
+- Radio button selection for answers
+- Immediate feedback in Interactive mode (with explanations)
+- Navigation buttons to move between questions
+
+**Results & Visualizations:**
+- **Score Overview**: Gauge chart showing your percentage score
+- **Difficulty Breakdown**: Bar chart showing performance by difficulty level
+- **Time Analysis**: Time spent per question (if available)
+- **Question Review**: Expandable sections for each question with:
+  - Your answer vs. correct answer
+  - Explanations
+  - Time taken per question
+
+**UI/UX Enhancements:**
+- Color-coded feedback (green for correct, red for incorrect)
+- Progress tracking throughout the quiz
+- Responsive layout that works on different screen sizes
+- Easy navigation with Previous/Next buttons
+- Option to start a new quiz after completion
+
+### Streamlit vs CLI Comparison
+
+| Feature                 | CLI                    | Streamlit UI                                         |
+| ----------------------- | ---------------------- | ---------------------------------------------------- |
+| Quiz Generation         | ✅                      | ✅                                                    |
+| Interactive Mode        | ✅                      | ✅                                                    |
+| Batch Mode              | ✅                      | ✅                                                    |
+| Configuration Options   | ✅                      | ✅                                                    |
+| Visual Feedback         | Text-based             | Visual with colors                                   |
+| Charts & Visualizations | ❌                      | ✅ (Score gauge, difficulty breakdown, time analysis) |
+| Question Review         | Table format           | Expandable sections                                  |
+| Arrow Key Navigation    | ✅                      | ❌ (Uses radio buttons)                               |
+| Terminal Integration    | ✅                      | ❌                                                    |
+| Accessibility           | High (themes, symbols) | Good (web standards)                                 |
+
+**When to use CLI:**
+- Terminal-based workflows
+- Scripting and automation
+- Quick quizzes without opening a browser
+- Prefer keyboard navigation
+
+**When to use Streamlit:**
+- Visual learners who benefit from charts
+- Sharing quizzes with others (web-based)
+- Detailed performance analysis
+- Prefer mouse/touch interaction
+
+### Troubleshooting Streamlit
+
+**App won't start:**
+- Ensure Streamlit is installed: `uv sync`
+- Check that you're in the project root directory
+- Verify your Python environment is activated
+
+**API Key errors:**
+- Make sure `GEMINI_API_KEY` is set in your environment or `.env` file
+- Restart the Streamlit app after setting the key
+
+**Visualizations not showing:**
+- Ensure Plotly is installed: `uv sync`
+- Check browser console for JavaScript errors
+- Try refreshing the page
+
+**Session state issues:**
+- Use the "Start New Quiz" button to reset state
+- Refresh the browser if the app becomes unresponsive
 
 ## Development
 
