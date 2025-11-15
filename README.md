@@ -15,6 +15,17 @@ A quiz application powered by Gemini Flash 2.5 for generating quiz questions. Av
   - [File Responsibilities](#file-responsibilities)
   - [Folder structure](#folder-structure)
   - [Installation](#installation)
+  - [Environment Variable Configuration](#environment-variable-configuration)
+    - [Priority Order](#priority-order)
+    - [Configuration Methods](#configuration-methods)
+      - [1. System Environment Variables](#1-system-environment-variables)
+      - [2. `.env` File (Project Root)](#2-env-file-project-root)
+      - [3. `.zshenv` File (Zsh Users)](#3-zshenv-file-zsh-users)
+      - [4. Standard Input (Piped)](#4-standard-input-piped)
+      - [5. Interactive Prompting](#5-interactive-prompting)
+      - [6. Custom Environment File (`--env-file`)](#6-custom-environment-file---env-file)
+    - [Examples](#examples)
+    - [Troubleshooting](#troubleshooting)
   - [Usage](#usage)
     - [Command-Line Options](#command-line-options)
     - [Basic Usage (Minimal Config)](#basic-usage-minimal-config)
@@ -22,7 +33,7 @@ A quiz application powered by Gemini Flash 2.5 for generating quiz questions. Av
     - [Batch Mode](#batch-mode)
     - [Advanced Configuration](#advanced-configuration)
     - [Answering Questions](#answering-questions)
-    - [Examples](#examples)
+    - [Examples](#examples-1)
   - [Streamlit Web Interface](#streamlit-web-interface)
     - [Launching the Streamlit App](#launching-the-streamlit-app)
     - [Streamlit Features](#streamlit-features)
@@ -145,6 +156,172 @@ cp .env.example .env
 # Edit .env and add your GEMINI_API_KEY
 ```
 
+## Environment Variable Configuration
+
+Quli supports flexible environment variable loading from multiple sources with a clear priority order. This allows you to configure the tool in a way that best fits your workflow.
+
+### Priority Order
+
+Environment variables are loaded in the following priority order (higher priority overrides lower):
+
+1. **CLI arguments** (via `--env-file` option) - **Highest Priority**
+2. **Standard input (stdin)**: piped or interactive entry
+3. **`.zshenv` file** (if zsh is installed): checked in current directory first, then `~/.zshenv`
+4. **`.env` file** (project root directory)
+5. **System environment variables** (already set in your shell) - **Lowest Priority**
+
+### Configuration Methods
+
+#### 1. System Environment Variables
+
+Set environment variables in your shell session:
+
+```bash
+export GEMINI_API_KEY="your-api-key-here"
+```
+```bash 
+quli -t "Python"
+```
+
+#### 2. `.env` File (Project Root)
+
+Create a `.env` file in your project root:
+
+```bash
+# .env
+GEMINI_API_KEY=your-api-key-here
+```
+
+This is the traditional method and works automatically when you run Quli.
+
+#### 3. `.zshenv` File (Zsh Users)
+
+If you use zsh, Quli will automatically check for `.zshenv` files:
+
+- **Current directory**: `./.zshenv` (checked first)
+- **Home directory**: `~/.zshenv` (checked if current directory file doesn't exist)
+
+Example `.zshenv` file:
+
+```bash
+# .zshenv
+export GEMINI_API_KEY="your-api-key-here"
+# Other environment variables
+export CUSTOM_VAR="value"
+```
+
+**Note**: Quli only reads `.zshenv` files if zsh is installed on your system. If zsh is not available, this method is skipped.
+
+#### 4. Standard Input (Piped)
+
+Pipe environment variables from a file or command:
+
+```bash
+# From a file
+cat .env | quli -t "Python"
+
+# From echo
+echo "GEMINI_API_KEY=your-key" | quli -t "Python"
+
+# Multiple variables
+cat <<EOF | quli -t "Python"
+GEMINI_API_KEY=your-key
+CUSTOM_VAR=value
+EOF
+```
+
+**Supported formats:**
+- `KEY=value`
+- `export KEY=value`
+
+#### 5. Interactive Prompting
+
+If no environment variables are found and you're running Quli interactively (not piped), you'll be prompted to enter them:
+
+```bash
+quli -t "Python"
+# If GEMINI_API_KEY is not set, you'll see:
+# Enter environment variables (KEY=value format, one per line).
+# Press Enter on empty line to finish, or Ctrl+D.
+```
+
+Enter variables one per line:
+```
+GEMINI_API_KEY=your-api-key-here
+CUSTOM_VAR=value
+
+# Press Enter on empty line to finish
+```
+
+#### 6. Custom Environment File (`--env-file`)
+
+Specify a custom environment file path:
+
+```bash
+quli --env-file /path/to/custom.env -t "Python"
+```
+
+The file should be in standard `.env` format (KEY=value pairs).
+
+### Examples
+
+**Using .zshenv (automatic for zsh users):**
+```bash
+# Create .zshenv in your project directory
+echo 'export GEMINI_API_KEY="your-key"' > .zshenv
+quli -t "Python"  # Automatically loads from .zshenv
+```
+
+**Piping from stdin:**
+```bash
+echo "GEMINI_API_KEY=test-key" | quli -t "Test Quiz"
+```
+
+**Interactive entry:**
+```bash
+quli -t "Python"
+# When prompted, enter:
+# GEMINI_API_KEY=your-key
+# [Press Enter on empty line]
+```
+
+**Using custom env file:**
+```bash
+quli --env-file ~/.config/quli.env -t "Python"
+```
+
+**Combining methods (priority example):**
+```bash
+# .env has: GEMINI_API_KEY=env-key
+# stdin has: GEMINI_API_KEY=stdin-key
+echo "GEMINI_API_KEY=stdin-key" | quli -t "Python"
+# Result: Uses stdin-key (stdin overrides .env)
+```
+
+### Troubleshooting
+
+**Environment variable not found:**
+- Check that the variable is set in at least one of the supported sources
+- Verify the variable name is correct (case-sensitive)
+- For `.zshenv`, ensure zsh is installed (`which zsh`)
+- Try using `--env-file` to explicitly specify a file
+
+**`.zshenv` not being read:**
+- Verify zsh is installed: `which zsh` or `zsh --version`
+- Check file exists: `ls -la .zshenv` or `ls -la ~/.zshenv`
+- Ensure file has correct format (KEY=value or export KEY=value)
+
+**Interactive prompt not appearing:**
+- Interactive prompts only appear when stdin is a TTY (not piped)
+- If you're piping input, variables should be in the piped data
+- Check that `GEMINI_API_KEY` is actually missing: `echo $GEMINI_API_KEY`
+
+**Variable format issues:**
+- Use `KEY=value` format (no spaces around =)
+- For values with spaces, use quotes: `KEY="value with spaces"`
+- Comments start with `#`
+- Empty lines are ignored
+
 ## Usage
 
 ### Command-Line Options
@@ -155,6 +332,7 @@ cp .env.example .env
 | `--interactive` | `-i`  | Run in interactive mode (question-by-question with immediate feedback)  |
 | `--batch`       | `-b`  | Run in batch mode (answer all questions, then see results)              |
 | `--advanced`    | `-a`  | Use advanced configuration (customize difficulty, question types, etc.) |
+| `--env-file`    | `-e`  | Path to custom environment file (.env format) to load                   |
 
 **Note:** If no topic is provided, the app will prompt for advanced configuration interactively.
 

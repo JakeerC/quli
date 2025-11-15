@@ -1,6 +1,7 @@
 """CLI interface for the quiz app."""
 
 import sys
+from pathlib import Path
 
 import click
 from rich.console import Console
@@ -8,6 +9,7 @@ from rich.panel import Panel
 from rich.prompt import Prompt
 from rich.rule import Rule
 
+from quli.config import load_environment_variables, parse_env_line
 from quli.engine import QuizEngine
 from quli.generator import QuizGenerator
 from quli.models import Difficulty, QuestionType, QuizConfig
@@ -16,6 +18,62 @@ from quli.ui.styles import build_console, detect_style
 from quli.utils.selection import select_option
 
 console = Console()
+
+
+def prompt_for_environment_variables() -> None:
+    """
+    Interactively prompt user for environment variables.
+
+    Prompts user to enter environment variables in KEY=value format.
+    Supports multiple variables, one per line. Empty line or Ctrl+D to finish.
+    """
+    console.print("\n[bold yellow]Environment Variables[/bold yellow]")
+    console.print(
+        "[dim]Enter environment variables (KEY=value format, one per line). "
+        "Press Enter on empty line to finish, or Ctrl+D.[/dim]\n"
+    )
+
+    env_vars: dict[str, str] = {}
+    line_count = 0
+
+    while True:
+        try:
+            line = Prompt.ask(
+                f"Env var {line_count + 1}",
+                default="",
+                show_default=False,
+            ).strip()
+
+            # Empty line means finish
+            if not line:
+                break
+
+            # Parse the line
+            parsed = parse_env_line(line)
+            if parsed:
+                key, value = parsed
+                env_vars[key] = value
+                line_count += 1
+                console.print(f"[green]✓[/green] Set {key}")
+            else:
+                console.print(
+                    "[yellow]⚠[/yellow] Invalid format. Use KEY=value or export KEY=value"
+                )
+
+        except (EOFError, KeyboardInterrupt):
+            # Ctrl+D or Ctrl+C - finish input
+            break
+
+    # Apply the environment variables
+    import os
+
+    for key, value in env_vars.items():
+        os.environ[key] = value
+
+    if env_vars:
+        console.print(f"\n[green]Loaded {len(env_vars)} environment variable(s)[/green]\n")
+    else:
+        console.print("[dim]No environment variables entered.[/dim]\n")
 
 
 def get_advanced_config() -> QuizConfig:
@@ -73,6 +131,13 @@ def get_advanced_config() -> QuizConfig:
     help="Use advanced configuration",
 )
 @click.option(
+    "--env-file",
+    "-e",
+    type=click.Path(exists=True, path_type=Path),
+    help="Path to environment file (.env format) to load",
+    default=None,
+)
+@click.option(
     "--style",
     type=click.Choice(["auto", "classic", "high-contrast"]),
     default="auto",
@@ -110,11 +175,24 @@ def main(
     interactive: bool,
     batch: bool,
     advanced: bool,
+    env_file: Path | None,
     style: str,
     ascii_override: bool | None,
     nerd_font: bool | None,
 ) -> None:
     """Quli - CLI Quiz App powered by Gemini Flash 2.5."""
+    # Load environment variables first (before building console to avoid style issues)
+    import os
+
+    load_environment_variables(env_file=env_file, load_stdin=True, load_zsh_env=True)
+
+    # Check if we need to prompt for environment variables
+    # Only prompt if stdin is a TTY (interactive) and GEMINI_API_KEY is not set
+    # Note: read_env_from_stdin() only reads when stdin is piped (not TTY),
+    # so if we're here and stdin is a TTY, we haven't read from stdin yet
+    if sys.stdin.isatty() and not os.getenv("GEMINI_API_KEY"):
+        prompt_for_environment_variables()
+
     # Build console with style
     style_config = detect_style(style)  # auto/classic/high-contrast
     if ascii_override is True:
