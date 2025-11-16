@@ -2,7 +2,7 @@
 
 import streamlit as st
 
-from quli.models import Question, QuestionType
+from quli_quiz.models import Question, QuestionType
 
 
 def render_question(question: Question, question_num: int, total: int) -> None:

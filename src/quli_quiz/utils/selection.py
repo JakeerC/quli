@@ -9,7 +9,7 @@ from prompt_toolkit.widgets import RadioList
 from rich.console import Console
 from rich.prompt import Prompt
 
-from quli.ui.styles import get_console, get_symbols
+from quli_quiz.ui.styles import get_console, get_symbols
 
 console = Console()
 

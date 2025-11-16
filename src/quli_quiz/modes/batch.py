@@ -2,9 +2,9 @@
 
 from rich.console import Console
 
-from quli.engine import QuizEngine
-from quli.ui.display import display_question, display_results
-from quli.ui.input import get_answer_interactive, get_answer_simple
+from quli_quiz.engine import QuizEngine
+from quli_quiz.ui.display import display_question, display_results
+from quli_quiz.ui.input import get_answer_interactive, get_answer_simple
 
 console = Console()
 

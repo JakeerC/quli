@@ -5,9 +5,9 @@ import sys
 from rich.console import Console
 from rich.prompt import Prompt
 
-from quli.models import Question, QuestionType
-from quli.ui.styles import get_console
-from quli.utils.selection import select_option, select_with_arrows
+from quli_quiz.models import Question, QuestionType
+from quli_quiz.ui.styles import get_console
+from quli_quiz.utils.selection import select_option, select_with_arrows
 
 console = Console()
 

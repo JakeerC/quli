@@ -2,8 +2,8 @@
 
 import streamlit as st
 
-from quli.engine import QuizEngine
-from quli.models import Quiz, QuizResult
+from quli_quiz.engine import QuizEngine
+from quli_quiz.models import Quiz, QuizResult
 
 
 def initialize_session_state() -> None:

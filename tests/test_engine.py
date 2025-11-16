@@ -1,7 +1,7 @@
 """Tests for quiz engine."""
 
-from quli.engine import QuizEngine
-from quli.models import Difficulty, Question, QuestionType, Quiz, QuizConfig
+from quli_quiz.engine import QuizEngine
+from quli_quiz.models import Difficulty, Question, QuestionType, Quiz, QuizConfig
 
 
 def create_sample_quiz() -> Quiz:

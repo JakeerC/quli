@@ -2,7 +2,7 @@
 
 import streamlit as st
 
-from quli.models import Difficulty, QuestionType, QuizConfig
+from quli_quiz.models import Difficulty, QuestionType, QuizConfig
 
 
 def render_quiz_config() -> QuizConfig | None:
