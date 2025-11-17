@@ -2,7 +2,7 @@
 
 import time
 
-from quli.models import Question, Quiz, QuizResult, UserAnswer
+from quli_quiz.models import Question, Quiz, QuizResult, UserAnswer
 
 
 class QuizEngine:

@@ -4,8 +4,8 @@ from google import genai
 from google.genai import types
 from pydantic import BaseModel, Field
 
-from quli.config import get_gemini_api_key
-from quli.models import Difficulty, Question, QuestionType, Quiz, QuizConfig
+from quli_quiz.config import get_gemini_api_key
+from quli_quiz.models import Difficulty, Question, QuestionType, Quiz, QuizConfig
 
 
 class QuizGenerator:

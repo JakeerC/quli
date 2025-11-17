@@ -4,8 +4,8 @@ from rich.panel import Panel
 from rich.rule import Rule
 from rich.table import Table
 
-from quli.models import Question, QuestionType, QuizResult
-from quli.ui.styles import get_console, get_symbols
+from quli_quiz.models import Question, QuestionType, QuizResult
+from quli_quiz.ui.styles import get_console, get_symbols
 
 
 def display_question(question: Question, question_num: int, total: int) -> None:

@@ -1,9 +1,21 @@
 [project]
-name = "quli"
-version = "2.0.0"
+name = "quli-quiz"
+version = "2.1.0"
 description = "CLI quiz app powered by Gemini Flash 2.5"
 readme = "README.md"
 requires-python = ">=3.10"
+license = { text = "MIT" }
+authors = [{ name = "Jakeer C", email = "jakeer.builds@gmail.com" }]
+keywords = ["quiz", "cli", "gemini", "education"]
+classifiers = [
+    "Development Status :: 4 - Beta",
+    "Intended Audience :: Education",
+    "License :: OSI Approved :: MIT License",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+]
 dependencies = [
     "pydantic>=2.0.0",
     "google-genai==1.49.0",
@@ -19,8 +31,8 @@ dependencies = [
 dev = ["pytest>=7.0.0"]
 
 [project.scripts]
-quli = "quli.cli:main"
-quli-streamlit = "quli.streamlit_app:run_streamlit"
+quli = "quli_quiz.cli:main"
+quli-streamlit = "quli_quiz.streamlit_app:run_streamlit"
 
 [build-system]
 requires = ["hatchling"]
@@ -47,3 +59,6 @@ indent-style = "space"
 line-ending = "auto"
 skip-magic-trailing-comma = false
 docstring-code-format = true
+
+[dependency-groups]
+dev = ["twine>=6.2.0"]

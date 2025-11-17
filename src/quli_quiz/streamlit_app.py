@@ -2,9 +2,9 @@
 
 import streamlit as st
 
-from quli.engine import QuizEngine
-from quli.generator import QuizGenerator
-from quli.ui.streamlit import config, question, results, utils
+from quli_quiz.engine import QuizEngine
+from quli_quiz.generator import QuizGenerator
+from quli_quiz.ui.streamlit import config, question, results, utils
 
 # Page configuration
 st.set_page_config(

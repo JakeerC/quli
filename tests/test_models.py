@@ -2,7 +2,7 @@
 
 import pytest
 
-from quli.models import Difficulty, Question, QuestionType, Quiz, QuizConfig, QuizResult, UserAnswer
+from quli_quiz.models import Difficulty, Question, QuestionType, Quiz, QuizConfig, QuizResult, UserAnswer
 
 
 def test_question_validation():

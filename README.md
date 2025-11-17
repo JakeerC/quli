@@ -111,7 +111,7 @@ uv run quli --style high-contrast --nerd-font
 
 ## Folder structure
 ```
-src/quli/
+src/quli_quiz/
 ├── __init__.py
 ├── cli.py
 ├── streamlit_app.py          # Streamlit web interface
@@ -471,7 +471,7 @@ Quli includes a modern web-based interface built with Streamlit, providing an in
 After installing dependencies, launch the web interface:
 
 ```bash
-streamlit run src/quli/streamlit_app.py
+streamlit run src/quli_quiz/streamlit_app.py
 ```
 
 Or use the convenience script (if configured):

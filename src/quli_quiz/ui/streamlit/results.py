@@ -4,7 +4,7 @@ import plotly.express as px
 import plotly.graph_objects as go
 import streamlit as st
 
-from quli.models import QuizResult
+from quli_quiz.models import QuizResult
 
 
 def render_results(result: QuizResult) -> None:

@@ -9,13 +9,13 @@ from rich.panel import Panel
 from rich.prompt import Prompt
 from rich.rule import Rule
 
-from quli.config import load_environment_variables, parse_env_line
-from quli.engine import QuizEngine
-from quli.generator import QuizGenerator
-from quli.models import Difficulty, QuestionType, QuizConfig
-from quli.modes import run_batch_mode, run_interactive_mode
-from quli.ui.styles import build_console, detect_style
-from quli.utils.selection import select_option
+from quli_quiz.config import load_environment_variables, parse_env_line
+from quli_quiz.engine import QuizEngine
+from quli_quiz.generator import QuizGenerator
+from quli_quiz.models import Difficulty, QuestionType, QuizConfig
+from quli_quiz.modes import run_batch_mode, run_interactive_mode
+from quli_quiz.ui.styles import build_console, detect_style
+from quli_quiz.utils.selection import select_option
 
 console = Console()
 
@@ -203,7 +203,7 @@ def main(
         style_config.use_nerd_font = bool(nerd_font) and style_config.use_unicode
     # Refresh symbols based on final toggles
     # Re-import helper to avoid circular import
-    from quli.ui.styles import _select_symbols as _sym_sel  # type: ignore
+    from quli_quiz.ui.styles import _select_symbols as _sym_sel  # type: ignore
 
     style_config.symbols = _sym_sel(style_config.use_unicode, style_config.use_nerd_font)
     global console
