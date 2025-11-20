@@ -14,7 +14,14 @@ A quiz application powered by Gemini Flash 2.5 for generating quiz questions. Av
     - [Example](#example)
   - [File Responsibilities](#file-responsibilities)
   - [Folder structure](#folder-structure)
-  - [Installation](#installation)
+  - [Development Setup](#development-setup)
+    - [Prerequisites](#prerequisites)
+    - [Install Dependencies](#install-dependencies)
+    - [Configure Environment](#configure-environment)
+    - [Run and Test in Development](#run-and-test-in-development)
+  - [Install from PyPI](#install-from-pypi)
+    - [pip install](#pip-install)
+    - [pipx or `uv tool` installation](#pipx-or-uv-tool-installation)
   - [Environment Variable Configuration](#environment-variable-configuration)
     - [Priority Order](#priority-order)
     - [Configuration Methods](#configuration-methods)
@@ -26,7 +33,7 @@ A quiz application powered by Gemini Flash 2.5 for generating quiz questions. Av
       - [6. Custom Environment File (`--env-file`)](#6-custom-environment-file---env-file)
     - [Examples](#examples)
     - [Troubleshooting](#troubleshooting)
-  - [Usage](#usage)
+  - [CLI Application Usage](#cli-application-usage)
     - [Command-Line Options](#command-line-options)
     - [Basic Usage (Minimal Config)](#basic-usage-minimal-config)
     - [Interactive Mode](#interactive-mode)
@@ -34,12 +41,11 @@ A quiz application powered by Gemini Flash 2.5 for generating quiz questions. Av
     - [Advanced Configuration](#advanced-configuration)
     - [Answering Questions](#answering-questions)
     - [Examples](#examples-1)
-  - [Streamlit Web Interface](#streamlit-web-interface)
+  - [UI Application (Streamlit)](#ui-application-streamlit)
     - [Launching the Streamlit App](#launching-the-streamlit-app)
     - [Streamlit Features](#streamlit-features)
     - [Streamlit vs CLI Comparison](#streamlit-vs-cli-comparison)
     - [Troubleshooting Streamlit](#troubleshooting-streamlit)
-  - [Development](#development)
 
 ## Features
 
@@ -138,23 +144,82 @@ src/quli_quiz/
     └── batch.py (run_batch_mode)
 ```
 
-## Installation
+## Development Setup
 
-1. Install uv (if not already installed):
+Build and run Quli locally when you want the full development experience (live editing, tests, and both CLI/UI entry points available from source).
+
+### Prerequisites
+
+- Python **3.10+**
+- [`uv`](https://github.com/astral-sh/uv) for dependency management
+- A Google Gemini API key with access to **Gemini Flash 2.5**
+
+Install `uv` if you do not already have it:
+
 ```bash
 curl -LsSf https://astral.sh/uv/install.sh | sh
 ```
 
-2. Install dependencies:
+### Install Dependencies
+
 ```bash
-uv sync
+git clone https://github.com/<your-org>/quli.git
+cd quli
+uv sync --dev
 ```
 
-3. Set up environment variables:
+Running `uv sync --dev` installs the runtime dependencies from `pyproject.toml` plus developer extras such as `pytest`.
+
+### Configure Environment
+
+1. Copy the provided template and add your credentials:
+   ```bash
+   cp .env.example .env
+   ```
+2. Add `GEMINI_API_KEY` (and any optional overrides) to `.env` or use any of the other methods described in [Environment Variable Configuration](#environment-variable-configuration).
+
+### Run and Test in Development
+
+- **CLI entry point:** `uv run quli --topic "Python"` (runs `quli_quiz.cli:main`)
+- **UI entry point:** `uv run streamlit run src/quli_quiz/streamlit_app.py` or `uv run quli-streamlit`
+- **Unit tests:** `uv run pytest tests/`
+
+While iterating on code, you can rerun either entry point with `uv run ...` to pick up local changes without reinstalling. The `quli_quiz` package itself lives under `src/quli_quiz`, so editors should mark `src/` as a source root for import resolution.
+
+## Install from PyPI
+
+If you only need to consume Quli (not hack on it), install the published package and use the generated console scripts.
+
+### pip install
+
 ```bash
-cp .env.example .env
-# Edit .env and add your GEMINI_API_KEY
+pip install --upgrade quli-quiz
 ```
+
+Dependencies listed in `pyproject.toml` (Rich, Click, Prompt Toolkit, Streamlit, Plotly, google-genai, etc.) are pulled automatically. After installation:
+
+- `quli` launches the CLI quiz experience (maps to `quli_quiz.cli:main`).
+- `quli-streamlit` launches the Streamlit UI (`quli_quiz.streamlit_app:run_streamlit`).
+
+Example:
+
+```bash
+export GEMINI_API_KEY="sk-your-key"
+quli --topic "Python standard library" --interactive
+```
+
+### pipx or `uv tool` installation
+
+For isolated, globally available binaries:
+
+```bash
+pipx install quli-quiz          # or: pipx upgrade quli-quiz
+
+# alternatively
+uv tool install quli-quiz       # uses uv-managed virtualenv
+```
+
+Both commands install the same console scripts (`quli`, `quli-streamlit`). Update later with `pipx upgrade quli-quiz` or `uv tool update quli-quiz`.
 
 ## Environment Variable Configuration
 
@@ -322,7 +387,15 @@ echo "GEMINI_API_KEY=stdin-key" | quli -t "Python"
 - Comments start with `#`
 - Empty lines are ignored
 
-## Usage
+## CLI Application Usage
+
+The CLI interface is exposed through the `quli` console script (or `uv run quli` in development). It requires:
+
+- Python **3.10+** (handled automatically when installed via pip/pipx/uv tool)
+- Runtime dependencies installed with the package (Rich, Click, Prompt Toolkit, etc.)
+- `GEMINI_API_KEY` supplied via one of the supported configuration methods
+
+Verify the entry point is available with `quli --help`, or run directly from source using `uv run quli`.
 
 ### Command-Line Options
 
@@ -462,7 +535,9 @@ uv run quli -a -t "History"
 # Then select: True/False only
 ```
 
-## Streamlit Web Interface
+## UI Application (Streamlit)
+
+The Streamlit experience runs via the `quli-streamlit` console script (pip install) or `uv run streamlit run src/quli_quiz/streamlit_app.py` during development. It shares the same dependencies as the CLI plus Streamlit/Plotly, which are already declared in `pyproject.toml`. Ensure `GEMINI_API_KEY` is available before launching.
 
 Quli includes a modern web-based interface built with Streamlit, providing an intuitive alternative to the CLI with visual feedback and interactive charts.
 
@@ -478,6 +553,13 @@ Or use the convenience script (if configured):
 
 ```bash
 uv run quli-streamlit
+```
+
+Example after a PyPI install:
+
+```bash
+export GEMINI_API_KEY="sk-your-key"
+quli-streamlit --server.port 8502
 ```
 
 The app will open in your default web browser, typically at `http://localhost:8501`.
@@ -560,11 +642,4 @@ The app will open in your default web browser, typically at `http://localhost:85
 **Session state issues:**
 - Use the "Start New Quiz" button to reset state
 - Refresh the browser if the app becomes unresponsive
-
-## Development
-
-Run tests:
-```bash
-uv run pytest tests/
-```
 
